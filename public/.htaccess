@@ -1,0 +1,23 @@
+<IfModule mod_rewrite.c>
+    
+    RewriteEngine On
+    RewriteBase /
+
+    RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+   
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME} !-l
+    RewriteRule ^(.*)$ index.php?$1 [L,QSA]
+
+    RewriteRule ^(\.git|bin|tmp|webserver-configs|tests)/(.*) error [F]
+    RewriteRule ^(core|vendor)/(.*)\.(txt|xml|md|html|yaml|yml|php|pl|py|cgi|twig|sh|bat)$ error [F]
+    RewriteRule ^(public)/(.*)\.(txt|md|yaml|yml|php|pl|py|cgi|twig|sh|bat)$ error [F]
+    RewriteRule \.md$ error [F]
+    RewriteRule (^|/)\.(?!well-known) - [F]
+    RewriteRule ^(LICENSE\.txt|robots\.txt|composer\.lock|composer\.json|\.htaccess)$ error [F]
+
+</IfModule>
+
+Options -Indexes
+DirectoryIndex index.php index.html index.htm
