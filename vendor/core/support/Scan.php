@@ -60,12 +60,17 @@ class Scan
 
     public function scan($mainFolder)
     {
-        $foldersOrFiles = scandir( $this->app->file->to(DS . $mainFolder) );
+        if($this->is_dir($mainFolder))
+        {
+           $foldersOrFiles = scandir( $this->app->file->to(DS . $mainFolder) );
 
-        array_shift( $foldersOrFiles );
-        array_shift( $foldersOrFiles );
+            array_shift( $foldersOrFiles );
+            array_shift( $foldersOrFiles );
 
-        return $foldersOrFiles;
+            return $foldersOrFiles; 
+        } 
+
+        return [];
     }
 
     public function scanWithFullPath($mainFolder)

@@ -13,7 +13,7 @@ class UsersController extends Controller
     ];
 
     public function index()
-    {
+    {dd($this->session->get('user'));
         //$data = $this->users->all();
 
         $data = $this->users->select();
@@ -82,6 +82,7 @@ class UsersController extends Controller
 
     public function create()
     {
+
         $addUserForm = $this->form->create(AddNewUserForm::class)->form();
 
         return $this->view->render('users/views/create',['addUserForm' => $addUserForm],__('title'));

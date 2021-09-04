@@ -14,6 +14,22 @@ abstract class AbstractFormBuilder
         'before'            => '<div>',
         'after'             => '</div>'
     ];
+    protected $form = 
+    [
+        'id'           => '',
+        'class'          => '',
+        'action'            => '/TahirSystem/store/user',
+        'method'         => 'post',
+        'enctype'          => 'multipart/form-data',
+    ];
+    protected $button = 
+    [
+        'id'           => '',
+        'class'        => '',
+        'type'         => 'submit',
+        'onclick'      => '',
+        'text'         => 'Add User'
+    ];
 
     public function __construct()
     {

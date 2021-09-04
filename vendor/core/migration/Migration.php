@@ -16,7 +16,7 @@ class Migration
     public function applyMigrations()
     {
         $this->createMigrationTable();
-
+        
         $files = $this->app->scan->scanDir('app','migrations')->filesWithPathKeyValue();//return filename.php => path
 
         $executedMg = [];
@@ -25,6 +25,8 @@ class Migration
 
         foreach( $files as $fileName => $file )
         {
+            if(!str_contains($file,'migrations')) continue;
+
             $namespace = str_replace(ROOT_PATH,'',$file);
             $namespace = trim(str_replace($fileName,'',$namespace),DS);
             
@@ -45,7 +47,6 @@ class Migration
             
                 $executedMg['insert'][] = ['migration'=>$fileName,'query'=>$queryJson];
             }
-          
             elseif($this->tableNeedUpdate($fileName,$queryJson))
             {
                 $queryArr = (array) json_decode($this->currentQuery($fileName));
@@ -66,7 +67,8 @@ class Migration
                         if($key != 0)
                         {
                             $beforeColumn = $this->getColumn($queryArr[$key-1]);
-                            $this->app->db->exec("ALTER TABLE {$query[0]} ADD {$param} AFTER {$beforeColumn}");
+
+                            $this->app->db->exec("ALTER TABLE {$query[0]} ADD COLUMN IF NOT EXISTS {$param} AFTER {$beforeColumn}");
                         }  
                     }
                 }                
@@ -78,7 +80,7 @@ class Migration
                         if($key != 0)
                         {
                             $toDropColumn = $this->getColumn($param);
-                            $this->app->db->exec("ALTER TABLE {$query[0]} DROP COLUMN {$toDropColumn}");
+                            $this->app->db->exec("ALTER TABLE {$query[0]} DROP IF EXISTS {$toDropColumn}");
                         }  
                     }
                 }

@@ -8,10 +8,15 @@ class Request
     private $app;
     private $url;
     private $baseUrl;
+    private $post=[];
+    private $get=[];
 
     public function __construct($app)
     {
         $this->app = $app;
+
+        $this->get = $_GET;
+        $this->post = $_POST;
     }
 
     public function prepareUrl()
@@ -56,14 +61,14 @@ class Request
 
     public function cleanGet()
     {
-        $get = $_GET;
-        array_shift($get);
-        return $get;
+        array_shift($this->get);
+
+        return $this->get;
     }
 
     public function cleanPost()
     {
-        return $_POST;
+        return $this->post;
     }
 
     public function get($key, $default = null)
@@ -76,9 +81,9 @@ class Request
         return array_get($this->cleanPost(), $key, $default);
     }
 
-    public function method($key, $default = null)
+    public function method()
     {
-        return $this->server('REQUEST_METHOD');
+        return strtolower($this->server('REQUEST_METHOD'));
     }
 
     public function ArrNotEmpty($array)
@@ -100,9 +105,44 @@ class Request
         return false;
     }
 
+    public function hasGetRequest()
+    {
+        if($this->ArrNotEmpty($this->cleanGet()))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    public function hasPostRequest()
+    {
+        if($this->ArrNotEmpty($this->cleanPost()))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
     public function has($key)
     {
         return isset($this->all()[$key]);
+    }
+
+    public function hash($key)
+    {
+        if($this->hasGetRequest())
+        {
+            $this->get[$key] = $this->app->hash->crypt($this->get($key));
+        }
+
+        if($this->hasPostRequest())
+        {
+            $this->post[$key] = $this->app->hash->crypt($this->post($key));
+        }
+
+        return $this;
     }
 
     public function all()

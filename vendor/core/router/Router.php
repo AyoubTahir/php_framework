@@ -22,7 +22,7 @@ class Router
             'url'   => $url,
             'pattern'   => $this->generatePattern($url),
             'action'   => $this->getAction($action),
-            'method'   => $requestMethod,
+            'method'   => strtolower($requestMethod),
             'args' => $this->filterArgs($url)
         ];
 
@@ -39,7 +39,7 @@ class Router
                     'url'   => $url,
                     'pattern'   => $this->generatePattern($url),
                     'action'   => $this->getAction($controller . '@' . $methods[0]),
-                    'method'   => $methods[1],
+                    'method'   => strtolower($methods[1]),
                     'args' => $this->filterArgs($url)
                 ];
 
@@ -59,7 +59,7 @@ class Router
     {
         foreach($this->routes as $route)
         {
-            if($this->match($route['pattern']))
+            if($this->match($route['pattern']) && $route['method'] == $this->app->request->method() )
             {
                 $args = $this->getArgsFrom($route['pattern'],$route['args']);
 

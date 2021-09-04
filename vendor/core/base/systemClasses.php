@@ -20,4 +20,5 @@ return [
     'migration'   => 'Tahir\migration\Migration',
     'datatable'   => 'Tahir\datatable\Datatable',
     'form'   => 'Tahir\form\FormBuilder',
+    'hash'   => 'Tahir\support\Hash',
 ];

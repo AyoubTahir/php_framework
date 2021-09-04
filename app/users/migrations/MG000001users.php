@@ -8,10 +8,13 @@ class MG000001users extends Migrate
 
     public function up()
     {
-        $this->table('user');
+        $this->table('users');
         $this->id();
-        $this->varchar('firsst_name');
-        $this->varchar('for_name');
+        $this->varchar('firstname');
+        $this->varchar('lastname');
+        $this->varchar('email');
+        $this->varchar('password');
+        $this->varchar('image');
         $this->timestamps();
         return $this->create();
     }

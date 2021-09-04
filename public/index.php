@@ -1,6 +1,5 @@
 <?php
 session_start();
-
 defined('ROOT_PATH') or define('ROOT_PATH', realpath(dirname(dirname(__FILE__))));
 defined('DS') or define('DS', DIRECTORY_SEPARATOR);
 
@@ -24,7 +23,11 @@ $app    = Application::getInstance($file);
 
 if(!empty($_SERVER['REQUEST_URI']))
 {
-    $app->run();
+  //if (session_status() === PHP_SESSION_NONE)
+  //{
+    //session_start();
+  //}
+  $app->run();
 }
 else
 {

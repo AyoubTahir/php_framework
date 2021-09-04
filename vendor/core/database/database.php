@@ -362,12 +362,27 @@ class Database
         return $this;
     }
 
-    public function rawAndWhere($param, $operator = '=', $value)
+    public function rawAndWhere($param, $operator = '=', $value=null)
     {
-        $this->wheres[] = "AND " . $param . $operator . "? ";
+        if(is_array($param))
+        {
+            $and = '';
+            foreach( $param as $key => $value )
+            {
+                $this->wheres[] = $and . $key . $operator . "? ";
 
-        $this->bindParams($value);
+                $this->bindParams($value);
 
+                $and = 'AND ';
+            }
+        }
+        else
+        {
+           $this->wheres[] = "AND " . $param . $operator . "? ";
+           
+           $this->bindParams($value); 
+        }
+        
         return $this;
 
     }

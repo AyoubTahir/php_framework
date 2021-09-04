@@ -43,4 +43,5 @@ class Rules
     {
         return $data[$field] != $data[$confirmedWith] ? "The {$field} does not match {$confirmedWith}" : '';
     }
+
 }

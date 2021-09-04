@@ -140,7 +140,7 @@ if (!function_exists('errorField')) {
                 $stringError .= $error . '</br>';
             }
             
-            echo $stringError;
+            return $stringError;
         }
     }
 }

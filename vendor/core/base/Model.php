@@ -115,7 +115,7 @@ abstract class Model
         return $this;
     }
 
-    public function andWhere($id,$operator = '=',$value)
+    public function andWhere($id,$operator = '=',$value=null)
     {
         $this->rawAndWhere($id, $operator, $value);
         return $this;
@@ -155,6 +155,11 @@ abstract class Model
     public function get()
     {
         return $this->fetchAll($this->table);
+    }
+
+    public function single()
+    {
+        return $this->fetch($this->table);
     }
 
 }
