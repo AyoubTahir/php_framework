@@ -4,6 +4,7 @@ namespace App\Users;
 
 use Tahir\Base\Controller;
 use App\Users\UsersDatatable;
+use App\Users\Forms\AddNewUserForm;
 
 class UsersController extends Controller
 {
@@ -14,14 +15,12 @@ class UsersController extends Controller
     public function index()
     {
         //$data = $this->users->all();
-        //$data = $this->users->search(['lastname'=>'dd','image'=>'b'])->get();
-        
 
-        $dataTable = $this->datatable->create(UsersDatatable::class,$this->users->select());
+        $data = $this->users->select();
 
-        //$pagination = $this->users->paginate(4,5)->get();
+        $dataTable = $this->datatable->create(UsersDatatable::class,$data)->table();
 
-        return $this->view->render('users/views/index',[/*'users'=> $data,*/'table'=>$dataTable->table(),'pagination'=>$dataTable->pagination()],__r('title'));
+        return $this->view->render('users/views/index',['table'=>$dataTable],__r('title'));
     }
 
     public function blog($text,$id,$iid)
@@ -83,7 +82,9 @@ class UsersController extends Controller
 
     public function create()
     {
-        return $this->view->render('users/views/create',[],__('title'));
+        $addUserForm = $this->form->create(AddNewUserForm::class)->form();
+
+        return $this->view->render('users/views/create',['addUserForm' => $addUserForm],__('title'));
     }
 
     public function store($request)

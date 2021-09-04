@@ -258,11 +258,17 @@ class Database
 
         if($this->likes && $this->wheres)
         {
-            $query .= " AND " . implode('OR ',$this->likes);
+            $imp = " AND " . implode('OR ',$this->likes);
+
+            $query              .= $imp;
+            $this->countQuery   .= $imp;
         }
         elseif($this->likes && !$this->wheres)
         {
-            $query .= " WHERE " . implode('OR ',$this->likes);
+            $imp = " WHERE " . implode('OR ',$this->likes);
+
+            $query              .= $imp;
+            $this->countQuery   .= $imp;
         }
 
         if($this->limit)

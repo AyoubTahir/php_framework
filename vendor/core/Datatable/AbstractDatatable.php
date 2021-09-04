@@ -4,45 +4,67 @@ namespace Tahir\Datatable;
 
 abstract class AbstractDatatable
 {
-    protected $tableParams = [
-        'status' => '',
-        'orderby' => '',
-        'table_class' => ['table'],
-        'table_id' => 'datatable',
-        'show_table_thead' => true,
-        'show_table_tfoot' => false,
-        'before' => '<div>',
-        'after' => '</div>'
+    protected $tableParams = 
+    [
+        'status'            => '',
+        'table_class'       => ['table'],
+        'table_id'          => 'datatable',
+        'show_table_thead'  => true,
+        'show_table_tfoot'  => false,
+        'before'            => '<div>',
+        'after'             => '</div>'
     ];
-    protected $columnParams = [
-        'db_field' => '',
-        'dt_title' => '',
-        'class' => '',
-        'visible' => true,
-        'sortable' => false,
-        'formatter' => ''
+    protected $columnParams = 
+    [
+        'db_field'          => '',
+        'dt_title'          => '',
+        'class'             => '',
+        'visible'           => true,
+        'sortable'          => false,
+        'searchable'        => false,
+        'formatter'         => ''
     ];
 
-    protected array $attr = [];
+    protected $tablePagination = 
+    [
+        'ul_id'             => '',
+        'ul_class'          => 'pagination',
+        'li_class'          => 'page-item',
+        'a_class'           => 'page-link',
+    ];
+
+    protected $tableSearch = 
+    [
+        'form_class'            => 'd-flex',
+        'input_class'           => 'form-control me-2',
+        'button'                => true,
+        'button_class'          => 'btn btn-outline-success',
+    ];
+
+    protected $tablePerPage = 
+    [
+        'form_class'            => 'd-flex',
+        'select_class'           => 'form-select',
+        'perPage'                => ['10','20','50','100'],
+    ];
 
     public function __construct()
     {
-        $this->attr = $this->tableParams;
-
+        /*
         foreach ($this->attr as $key => $value)
         {
             if (!$this->validate($key, $value))
             {
                 $this->validate($key, $value);
             }
-        }
+        }*/
     }
 
-    public function setAttr($attributes = []) : self
+    public function setAttr($paramString,$attributes = [])
     {
         if (is_array($attributes) && count($attributes) > 0)
         {
-            $propKeys = array_keys($this->tableParams);
+            $propKeys = array_keys($this->$paramString);
 
             foreach ($attributes as $key => $value)
             {
@@ -51,12 +73,9 @@ abstract class AbstractDatatable
                     throw new BaseInvalidArgumentException('Invalid property key set.');
                 }
 
-                $this->validate($key, $value);
-
-                $this->attr[$key] = $value;
+                $this->$paramString[$key] = $value;
             }
         }
-        return $this;
     }
 
     protected function validate(string $key, $value) : void
@@ -69,7 +88,6 @@ abstract class AbstractDatatable
         switch ($key)
         {
             case 'status' :
-            case 'orderby' :
             case 'table_id' :
             case 'before' :
             case 'after' :

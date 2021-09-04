@@ -12,6 +12,8 @@ class Datatable extends AbstractDatatable
     private $data=[];
     private $totalRecord=0;
     private $perPage = 2;
+    private $pagination=true;
+    private $search = true;
 
     public function __construct($app)
     {
@@ -19,12 +21,35 @@ class Datatable extends AbstractDatatable
         parent::__construct();
     }
 
-    public function create($datatableColumnClass,$data)
+    public function create($datatableColumnClass,$data,$pagination=true,$search=true)
     {
         $obj                    = new $datatableColumnClass();
         $this->tableColumns     = $obj->columns();
-        $this->totalRecord      = $data->count();
-        $this->data             = $this->sortData($data->paginate($this->perPage,$this->offset())->get());
+        
+        $this->setAttr('tableParams',$obj->tableAttribute());
+        $this->setAttr('tablePagination',$obj->tablePagination());
+        $this->setAttr('tableSearch',$obj->tableSearch());
+        $this->setAttr('tablePerPage',$obj->tablePerPage());
+
+
+        $this->pagination       = $pagination;
+        $this->search           = $search;
+        $this->perPage          = $this->getperPage();
+
+        if($search)
+        {
+            $data         = $data->search($this->searchable());
+        }
+        if($pagination)
+        {
+            $this->totalRecord      = $data->count(); 
+            $data                   = $data->paginate($this->perPage,$this->offset());
+        }
+
+        $data = $data->get();
+
+        $this->data             = $this->sortData($data);
+
         return $this;
     }
 
@@ -35,13 +60,16 @@ class Datatable extends AbstractDatatable
             return;
         }
 
-        $this->element .= $this->attr['before'];
-        $this->element .= '<table id="'. ($this->attr['before'] ?? '') .'" class="'. implode(' ', $this->attr['table_class']) .'">'.PHP_EOL;
-        $this->element .= $this->tableHead($this->attr['status']);
+        $this->element .= $this->tableParams['before'];
+        $this->element .= $this->search ? $this->search() : '';
+        $this->element .= '<table id="'. ($this->tableParams['before'] ?? '') .'" class="'. implode(' ', $this->tableParams['table_class']) .'">'.PHP_EOL;
+        $this->element .= $this->tableHead($this->tableParams['status']);
         $this->element .= $this->tableBody();
         //$this->element .= $this->tableFooter();
         $this->element .= '</table>'.PHP_EOL;
-        $this->element .= $this->attr['after'];
+        $this->element .= $this->pagination ? $this->pagination()   : '';
+        $this->element .= $this->pagination ? $this->perPage()      : '';
+        $this->element .= $this->tableParams['after'];
 
         return $this->element;
     }
@@ -169,31 +197,43 @@ class Datatable extends AbstractDatatable
 
     public function pagination() : string
     {
+        $p = $this->tablePagination;
+
         $curentPage = $this->currentPage();
+
         $totalPages = (int)ceil($this->totalRecord / $this->perPage);
 
-        $element = '<ul>';
+        $op = $this->getSearch() ? '?search='.$this->getSearch().'&' : '?';
+
+        $element = '<ul id="'.$p['ul_id'].'" class="'.$p['ul_class'].'">';
 
         for($page=1;$page<=$totalPages;$page++)
         {
             if($curentPage == 1 && $page == 1)
             {
-                $element .= "<li><a href='javascript:void(0);'>Previous</li>";
+                $element .= '<li class="'.$p['li_class'].'" ><a class="'.$p['a_class'].'" href="javascript:void(0);">Previous</a></li>';
             }
             elseif($page == 1)
             {
-                $element .= '<li><a href="?page='.($curentPage-1).'">Previous</li>';
+                $element .= '<li class="'.$p['li_class'].'" ><a class="'.$p['a_class'].'" href="'.$op.'page='.($curentPage-1).'">Previous</a></li>';
             }
 
-            $element .= '<li><a href="?page='.$page.'">'.$page.'</li>';
+            if($page == $curentPage)
+            {
+                $element .= '<li class="'.$p['li_class'].'" ><a class="'.$p['a_class'].'" href="javascript:void(0);">'.$page.'</a></li>';
+            }
+            else
+            {
+                $element .= '<li class="'.$p['li_class'].'" ><a class="'.$p['a_class'].'" href="'.$op.'page='.$page.'">'.$page.'</a></li>';
+            }
 
             if($curentPage == $totalPages && $page == $totalPages)
             {
-                $element .= "<li><a href='javascript:void(0);'>Next</li>";
+                $element .= '<li class="'.$p['li_class'].'" ><a class="'.$p['a_class'].'" href="javascript:void(0);">Next</a></li>';
             }
             elseif($page == $totalPages)
             {
-                $element .= '<li><a href="?page='.($curentPage+1).'">Next</li>';
+                $element .= '<li class="'.$p['li_class'].'" ><a class="'.$p['a_class'].'" href="'.$op.'page='.($curentPage+1).'">Next</a></li>';
             }
         }
         
@@ -215,6 +255,74 @@ class Datatable extends AbstractDatatable
     {
         $curentPage = $this->currentPage();
 
-        return $this->perPage * ($curentPage - 1);;
+        return $this->perPage * ($curentPage - 1);
+    }
+
+    private function search()
+    {
+        $searchString = '<form method="get" action="" class="'.$this->tableSearch['form_class'].'">';
+        $searchString .= '<input class="'.$this->tableSearch['input_class'].'" type="search" name="search" placeholder="Search"/>';
+        $searchString .= $this->tableSearch['button'] ? '<button class="'.$this->tableSearch['button_class'].'" type="submit">Search</button>' : '';
+        $searchString .= '</form>';
+
+        return $searchString;
+    }
+
+    private function searchable()
+    {
+        if (!is_array($this->tableColumns) || count($this->tableColumns) == 0 )
+        {
+            return;
+        }
+
+        $search = $this->getSearch();
+
+        
+        $searchArr = [];
+
+        if($search)
+        {
+            foreach($this->tableColumns as $column)
+            {
+                if(isset($column['searchable']) && $column['searchable'])
+                {
+                    $searchArr = array_merge($searchArr,[$column['db_field']=>$search]);
+                }
+            }
+        }
+
+        return $searchArr;
+        
+    }
+
+    private function getSearch()
+    {
+        return $this->app->request->get('search') ? $this->app->request->get('search') : '';
+    }
+
+    private function perPage()
+    {
+        $search = $this->getSearch() ? '<input type="hidden" name="search" value="'.$this->getSearch().'" />' : '';
+
+        $select = '<form method="get" action="" class="'.$this->tablePerPage['form_class'].'">';
+        $select .= '<select class="'.$this->tablePerPage['select_class'].'" name="perpage" onchange="this.form.submit()">';
+        
+        foreach($this->tablePerPage['perPage'] as $index=>$perPage)
+        {
+
+            $select .= '<option '.$index = 0 ? 'selected' : '' .' value="'.$perPage.'">'.$perPage.'</option>';  
+
+        }
+
+        $select .= '</select>';
+        $select .= $search;
+        $select .= '</form>';
+
+        return $select;
+    }
+
+    private function getperPage()
+    {
+        return $this->app->request->get('perpage') ? (int)$this->app->request->get('perpage') : 2;       
     }
 }

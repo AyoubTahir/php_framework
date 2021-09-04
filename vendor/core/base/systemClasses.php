@@ -19,4 +19,5 @@ return [
     'scan'   => 'Tahir\support\Scan',
     'migration'   => 'Tahir\migration\Migration',
     'datatable'   => 'Tahir\datatable\Datatable',
+    'form'   => 'Tahir\form\FormBuilder',
 ];
