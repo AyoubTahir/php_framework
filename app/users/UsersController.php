@@ -13,7 +13,7 @@ class UsersController extends Controller
     ];
 
     public function index()
-    {dd($this->session->get('user'));
+    {
         //$data = $this->users->all();
 
         $data = $this->users->select();

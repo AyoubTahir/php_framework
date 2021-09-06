@@ -160,3 +160,21 @@ if (!function_exists('__'))
         echo __r($key);
     }
 }
+
+if (!function_exists('auth'))
+{
+    function auth()
+    {
+        if(app()->session->has('auth'))
+        {
+            $auth = app()->hash->decode(app()->session->get('auth'));
+            $user = $auth['auth_user'];
+
+            if(isset($user) && !empty($user))
+            {
+                return $user;
+            }  
+        }
+        return false;
+    }
+}

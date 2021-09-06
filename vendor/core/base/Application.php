@@ -97,9 +97,7 @@ class Application
 
         $this->request->prepareUrl();
 
-        list($controller, $action, $args) = $this->changeRoutingMethod();
-
-        $output = $this->load->action($controller, $action, $args);
+        $output = $this->changeRoutingMethod(env('ROUTES_METHOD'));
 
         if(! empty($output))
         {
@@ -125,20 +123,20 @@ class Application
 
     private function changeRoutingMethod($routingMethod = 'array')
     {
-        $arr = [];
+        $output = '';
 
-        if($routingMethod == 'file')
+        if($routingMethod == 'functions')
         {
             $this->file->call('routes/routes');
-            $arr = $this->router->getProperRoute();
+            $output = $this->router->getProperRoute();
         }
         elseif($routingMethod == 'array')
         {
             $routes = require($this->file->to('routes/routess.php'));
-            $arr = $this->router->addFromArray($routes)->getProperRoute();
+            $output = $this->router->addFromArray($routes)->getProperRoute();
         }
         
-        return $arr;
+        return $output;
     }
 
     public function runMigration()

@@ -1,25 +1,24 @@
 <?php
 return [
 
-    'Auth/AuthController' =>
-        [
-            '/login'  =>  ['index','get'],
-            '/submit'  =>  ['login','post'],
-        ],
+    [
+        'route'         => '/users',
+        'action'        => [App\Users\UsersController::class,'index'],
+        'method'        => 'get',
+        'middelwares'   => [App\Base\Middlewares\AuthMiddleware::class]
 
-     //post/:text/:id/:iid
-    'Users/UsersController'         =>
-        [
-            '/users'                    =>  ['index','get'],
-            '/add/user'                 =>  ['create','get'],
-            '/store/user'               =>  ['store','post'],
-            '/delete/user/:id'          =>  ['delete','get'],
-        ],
-
-    'Employees/EmployeesController' =>
-        [
-            '/employees'  =>  ['index','get'],
-        ]
-
+    ],
+    [
+        'route'         => '/add/user',
+        'action'        => [App\Users\UsersController::class,'create'],
+        'method'        => 'get',
+        'middelwares'   => [],
+    ],
+    [
+        'route'         => '/login',
+        'action'        => [App\Auth\AuthController::class,'index'],
+        'method'        => 'get',
+        'middelwares'   => [],
+    ],
 
 ];

@@ -28,7 +28,7 @@ class Loader
 
     public function getControllerName($controller)
     {
-        return 'App\\' . $controller;
+        return /*'App\\' .*/ $controller;
     }
 
     public function controller($controller)

@@ -4,7 +4,7 @@ return [
     'request'   => 'Tahir\http\Request',
     'response'   => 'Tahir\http\Response',
     'session'   => 'Tahir\session\Session',
-    //'cookie'   => 'Tahir\http\Response',
+    'cookie'   => 'Tahir\cookies\Cookie',
     'load'   => 'Tahir\base\Loader',
     //'html'   => 'Tahir\http\Response',
     'view'   => 'Tahir\view\ViewFactory',

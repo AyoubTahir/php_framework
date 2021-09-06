@@ -53,4 +53,37 @@ abstract class AbstractFormBuilder
             }
         }
     }
+
+    protected function createToken()
+    {
+		$seed = $this->urlSafeEncode(random_bytes(8));
+		$t = time();
+		$hash =  $this->urlSafeEncode(hash_hmac('sha256', session_id() . $seed . $t, env('SALT','$2a$07$yeXDSwRp12YopOhV0TrrRw$'), true));
+		return  $this->urlSafeEncode($hash . '|' . $seed . '|' . $t);
+	}
+
+    protected function validateToken($token)
+    {
+		$parts = explode('|',  $this->urlSafeDecode($token));
+		if(count($parts) === 3)
+        {
+			$hash = hash_hmac('sha256', session_id() . $parts[1] . $parts[2], CSRF_TOKEN_SECRET, true);
+			
+            if(hash_equals($hash,  $this->urlSafeDecode($parts[0])))
+            {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	protected function urlSafeEncode($m)
+    {
+		return rtrim(strtr(base64_encode($m), '+/', '-_'), '=');
+	}
+	public function urlSafeDecode($m)
+    {
+		return base64_decode(strtr($m, '-_', '+/'));
+	}
 }

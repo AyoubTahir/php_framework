@@ -40,7 +40,7 @@ class Session
 
     public function has($key)
     {
-        return isset($_SESSION[$key]);
+        return isset($_SESSION[$key]) && !empty($_SESSION[$key]);
     }
 
     public function remove($key)
